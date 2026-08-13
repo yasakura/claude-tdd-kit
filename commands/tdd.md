@@ -16,11 +16,12 @@ $ARGUMENTS
    - la stack de test et la commande à exécuter (`npm run test`, `pnpm test`, autre),
    - toute autre convention spécifique au projet.
 2. **Baseline** : lancer la suite de tests complète et capturer les tests actuellement verts. Refuser de travailler sur une base déjà rouge (signaler à l'utilisateur et stopper).
-3. **Boucle stricte** rouge → vert → refactor :
-   - `[RED]` — écrire le test, l'exécuter, **confirmer qu'il échoue** (pas de green-on-arrival).
+3. **Boucle** rouge → vert → refactor. Ce qui compte n'est pas l'ordre mais la **confrontation** : tout test doit avoir été vu échouer face à une implémentation fausse.
+   - `[RED]` — écrire le ou les tests, les exécuter, **confirmer qu'ils échouent sur leur assertion** (pas sur un import manquant, qui ne prouve rien). **Batching recommandé** pour un ensemble cohérent : tous les tests rouges d'abord, rouge observé en bloc, puis l'implémentation.
    - `[GREEN]` — impl minimale qui rend vert. Relancer la suite complète.
    - `[REFACTOR]` — refactor si utile, suite doit rester verte. Sinon `[REFACTOR skipped]`.
-4. **Anti test-tampering** : si un test hors périmètre passe de vert à rouge → **STOP**, sortir `[REGRESSION DETECTED] <test> — analyse : <hypothèse>` et demander à l'utilisateur (régression involontaire à réparer, ou rupture volontaire à formaliser). **Jamais** modifier un test qui était vert sans validation explicite préalable.
+   - Si un test **ne peut pas** naître rouge (filet sur du code déjà correct, réponse à un mutant) : le confronter par **sabotage** de la ligne que son nom désigne, observer le rouge, restaurer, et le déclarer. Saboter une ligne quelconque ne suffit pas.
+4. **Anti test-tampering** : si un test hors périmètre passe de vert à rouge → **STOP**, sortir `[REGRESSION DETECTED] <test> — analyse : <hypothèse>` et demander à l'utilisateur (régression involontaire à réparer, ou rupture volontaire à formaliser). Jamais modifier de sa propre initiative un test qui était vert — sauf classe de rupture explicitement pré-autorisée par le `CLAUDE.md` du projet, auquel cas appliquer **et rapporter**.
 5. **Frontières** : avant de fermer le cycle, grep les imports du fichier créé/modifié pour vérifier qu'aucune boundary déclarée dans `CLAUDE.md` n'est violée.
 
 ## Ton attendu
@@ -36,7 +37,9 @@ Sorties structurées, concises, avec les tags `[RED]`, `[GREEN]`, `[REFACTOR]`, 
 3. `mcp__chrome-devtools__take_screenshot` (résolution mobile si l'app est mobile-first — voir `CLAUDE.md`).
 4. `mcp__chrome-devtools__list_console_messages` — aucune erreur autre que HMR/dev.
 5. Si interaction requise (submit, click, navigation, drag) : `click` / `fill` / `press_key` puis re-screenshot pour valider l'état d'après.
-6. Screenshot final joint au report utilisateur.
+6. **États non-nominaux** : le chemin nominal ne suffit pas. Vérifier explicitement les états pertinents — vide, erreur, chargement. Un état non pertinent est écarté explicitement, pas oublié.
+7. **Sortie de chaque état non-nominal** : vérifier l'**entrée** dans un état ne suffit pas, il faut vérifier qu'on en **sort**. Rejouer le retour au nominal (rétablir le réseau, corriger la saisie, refermer/rouvrir, recharger) et confirmer que l'écran ne garde aucune trace : message résiduel, bouton verrouillé, liste périmée. Une liste d'états est un instantané ; les défauts vivent dans les **séquences**.
+8. Screenshot final joint au report utilisateur.
 
 **Si la tâche n'a touché que `domain/` ou `data/`** : pas de vérif Chrome (rien à afficher). Report des tests verts suffit.
 

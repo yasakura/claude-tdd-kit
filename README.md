@@ -15,9 +15,12 @@ L'idée : Claude code vite, et cède facilement à la facilité quand on lui dem
 
 ## Les règles imposées
 
-- **Toute ligne d'implémentation naît d'un test rouge.** Un test qui passe dès l'écriture (*green-on-arrival*) est rejeté : il ne teste rien.
+- **Ce qui compte n'est pas l'ordre, c'est la confrontation.** Un test n'a de valeur que s'il a été **vu échouer face à une implémentation fausse**. Écrire le test en premier est la façon la moins chère de l'obtenir — l'implémentation fausse est gratuite, c'est l'absence de code. Ce n'est pas la seule.
+- **Batching recommandé.** Tous les tests rouges d'un ensemble cohérent, rouge observé en bloc, puis l'implémentation. Un cycle unitaire par comportement rejoue la suite complète à chaque pas sans rien apporter.
+- **Quand un test ne peut pas naître rouge** (filet sur du code déjà correct, réponse à un mutant survivant), la confrontation se fait par **sabotage** : casser la ligne que le *nom* du test désigne, observer le rouge, restaurer. Saboter une ligne quelconque ne suffit pas — un test nommé « ne déverrouille pas le bouton » qui ne casse que sur une régression d'affichage est un faux filet.
 - **Baseline obligatoire.** L'agent refuse de travailler sur une suite déjà rouge.
-- **Anti test-tampering.** Un test vert qui devient rouge déclenche un `[REGRESSION DETECTED]` et un STOP. L'agent n'a jamais le droit de « réparer » le test lui-même — il te présente l'analyse et attend que tu tranches : régression involontaire, ou rupture volontaire à formaliser ?
+- **Anti test-tampering.** Un test vert qui devient rouge déclenche un `[REGRESSION DETECTED]` et un STOP. L'agent n'a jamais le droit de « réparer » le test de sa propre initiative — il te présente l'analyse et attend que tu tranches : régression involontaire, ou rupture volontaire à formaliser ? Un projet peut pré-autoriser une **classe précise** de rupture répétitive dans son `CLAUDE.md` (typiquement : ajouter un champ à un état casse tout `toEqual` exhaustif) ; l'agent applique alors **et rapporte**, au lieu de forcer un aller-retour dont l'arbitrage est toujours le même.
+- **Un double ne promet jamais plus que son port.** Là où un port déclare une garantie *absente*, le test-double doit exercer activement cette absence. Un double plus aimable que son contrat est un faux vert qu'aucun test ne peut attraper.
 - **Boundaries vérifiées par grep** avant de fermer chaque cycle, en plus du linter.
 - **Un bug trouvé en vérif navigateur est une spec absente**, pas un accident : interdiction de cowboy fix, il repart en cycle TDD complet.
 

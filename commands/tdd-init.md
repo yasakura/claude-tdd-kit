@@ -48,10 +48,26 @@ Template à adapter :
 
 ## TDD Uncle Bob (règle absolue)
 - Toute ligne d'implémentation naît d'un test rouge. Jamais l'inverse.
-- Cycle strict : rouge → vert → refactor.
 - Pour toute écriture ou modification de code productif dans <dossier source>/,
   DÉLÉGUER au sous-agent `tdd-clean-coder` (`~/.claude/agents/`) ou utiliser
   la slash command `/tdd <tâche>`.
+
+Ce qui compte n'est pas l'ORDRE, c'est la CONFRONTATION : un test n'a de valeur
+que s'il a été vu échouer face à une implémentation fausse. Écrire le test en
+premier est la façon la moins chère de l'obtenir, pas la seule.
+
+- Batching autorisé et recommandé : tous les tests rouges d'un ensemble cohérent,
+  rouge observé en bloc, puis l'implémentation.
+- Quand un test ne peut pas naître rouge (filet sur du code correct, réponse à un
+  mutant survivant) : confrontation par SABOTAGE de la ligne que le NOM du test
+  désigne, rouge observé, restauration. Saboter une ligne quelconque ne suffit pas.
+
+## Convention Test Doubles
+Un double ne promet jamais plus que son port. Là où un port déclare une garantie
+ABSENTE (ordre non garanti, unicité non garantie), le double doit exercer
+activement cette absence — ordre délibérément différent de l'insertion, jamais
+"par gentillesse". Un double plus aimable que son contrat est un faux vert
+structurel : aucun test ne peut l'attraper, puisque c'est le référentiel qui ment.
 
 ## Tests
 - <Couche pure> : <test runner> + adaptateurs in-memory.
