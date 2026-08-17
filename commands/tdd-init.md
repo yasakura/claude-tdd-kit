@@ -58,6 +58,14 @@ premier est la façon la moins chère de l'obtenir, pas la seule.
 
 - Batching autorisé et recommandé : tous les tests rouges d'un ensemble cohérent,
   rouge observé en bloc, puis l'implémentation.
+- PAS D'ÉMERGENCE PAS À PAS. Faire naître le code par micro-cycles est une
+  discipline humaine — elle empêche d'écrire plus vite qu'on ne réfléchit. Un
+  agent écrit l'implémentation complète d'un seul tenant, puis refactore si utile.
+  La contrainte n'est pas la TAILLE du pas, c'est que RIEN NE DÉPASSE LA SPEC :
+  aucune ligne qu'aucun test du lot n'exige. Pas de garde défensif « au cas où »,
+  pas de généralisation anticipée. Ce qu'aucun test ne demande est du code mort en
+  puissance ; la mutation le révèle, et la réponse est de le supprimer, pas
+  d'écrire un test pour le justifier.
 - Quand un test ne peut pas naître rouge (filet sur du code correct, réponse à un
   mutant survivant) : confrontation par SABOTAGE de la ligne que le NOM du test
   désigne, rouge observé, restauration. Saboter une ligne quelconque ne suffit pas.

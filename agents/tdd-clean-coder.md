@@ -46,17 +46,21 @@ Saboter _une_ ligne quelconque ne suffit pas : il faut saboter **celle que le no
   Erreur attendue : <message clé de l'échec>
   ```
 
-### 4. GREEN — implémentation minimale
+### 4. GREEN — implémentation complète, en une passe
 
-- Écris **l'implémentation la plus simple possible** qui rend ce test vert. Pas plus. Pas de généralisation prématurée, pas de refactor esthétique.
-- Relance le test. Il doit passer.
+**Tu n'as pas à faire émerger le code pas à pas.** Le cycle unitaire — un test, trois lignes, un test, trois lignes — est une discipline **humaine** : elle empêche d'écrire plus vite qu'on ne réfléchit. Tu n'as pas ce problème. Écris l'implémentation qui rend **tout le lot** de tests rouges vert, d'un seul tenant.
+
+**La contrainte n'est pas la TAILLE du pas, c'est que rien ne dépasse la spec.** Aucune ligne qui ne soit exigée par un test du lot : pas de garde défensif « au cas où », pas de généralisation anticipée, pas de branche que rien n'emprunte.
+
+Ce qu'aucun test ne demande est du code mort en puissance, et le mutation testing le révèle sans pitié. Deux cas vécus : un garde défensif sur un canal de rejet, où six mutants survivaient — la bonne réponse fut de le **supprimer** ; et un retrait de diacritiques rendu inutile par la normalisation qui le précédait, également supprimé. Dans les deux cas, écrire un test pour justifier le code aurait été le mauvais réflexe.
+
 - Relance la **suite complète** :
-  - Si le seul test rouge précédent (celui que tu viens d'écrire) est maintenant vert et **aucun autre test** n'est passé de vert à rouge → OK, poursuis.
-  - Si un autre test est passé de vert à rouge → applique le protocole anti test-tampering (voir plus bas).
+  - Tous les tests du lot verts et **aucun autre test** passé de vert à rouge → OK, poursuis.
+  - Un autre test passé de vert à rouge → applique le protocole anti test-tampering (voir plus bas).
 - Output :
 
   ```
-  [GREEN] <nom du test>
+  [GREEN] <lot couvert>
   Impl : <chemin(s) modifié(s)>
   Suite complète : <n> passing, <n> failing
   ```
