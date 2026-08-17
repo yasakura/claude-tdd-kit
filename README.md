@@ -12,7 +12,7 @@ L'idée : Claude code vite, et cède facilement à la facilité quand on lui dem
 | **`mutation-auditor`** (agent) | Exécute le mutation testing et **instruit chaque survivant** : trou de test réel avec son scénario non couvert, équivalent toléré, ou code mort à supprimer. Ne modifie rien. Séparé de l'agent qui écrit le code, exprès — celui-là ne doit pas noter sa propre copie. |
 | **`/tdd <tâche>`** | Délègue une tâche à l'agent, puis enchaîne sur une vérification navigateur si la tâche a touché l'UI. |
 | **`/tdd-init`** | Bootstrappe la gouvernance dans un projet : audit de la stack, génération d'un `CLAUDE.md` (boundaries + règles TDD + anti test-tampering + Definition of Done), proposition des garde-fous techniques. |
-| **`/verify <route>`** | Vérification navigateur ciblée via Chrome DevTools MCP : navigate + screenshot + erreurs console + interactions. Observation pure, aucune modification de code. |
+| **`/verify <route>`** | Vérification navigateur via Chrome DevTools MCP : nominal, états non-nominaux **et leurs sorties**, console, mesures. Observation pure, aucune modification de code. |
 
 ## Les règles imposées
 
@@ -22,6 +22,7 @@ L'idée : Claude code vite, et cède facilement à la facilité quand on lui dem
 - **Quand un test ne peut pas naître rouge** (filet sur du code déjà correct, réponse à un mutant survivant), la confrontation se fait par **sabotage** : casser la ligne que le *nom* du test désigne, observer le rouge, restaurer. Saboter une ligne quelconque ne suffit pas — un test nommé « ne déverrouille pas le bouton » qui ne casse que sur une régression d'affichage est un faux filet.
 - **Baseline obligatoire.** L'agent refuse de travailler sur une suite déjà rouge.
 - **Anti test-tampering.** Un test vert qui devient rouge déclenche un `[REGRESSION DETECTED]` et un STOP. L'agent n'a jamais le droit de « réparer » le test de sa propre initiative — il te présente l'analyse et attend que tu tranches : régression involontaire, ou rupture volontaire à formaliser ? Un projet peut pré-autoriser une **classe précise** de rupture répétitive dans son `CLAUDE.md` (typiquement : ajouter un champ à un état casse tout `toEqual` exhaustif) ; l'agent applique alors **et rapporte**, au lieu de forcer un aller-retour dont l'arbitrage est toujours le même.
+- **Vérifier l'entrée dans un état ne suffit pas, il faut vérifier qu'on en sort.** Une liste d'états est un instantané ; les défauts vivent dans les **séquences**. Rétablir le réseau, corriger la saisie, refermer/rouvrir — et confirmer que l'écran ne garde aucune trace : message résiduel, bouton verrouillé, formulaire figé.
 - **Un double ne promet jamais plus que son port.** Là où un port déclare une garantie *absente*, le test-double doit exercer activement cette absence. Un double plus aimable que son contrat est un faux vert qu'aucun test ne peut attraper.
 - **Boundaries vérifiées par grep** avant de fermer chaque cycle, en plus du linter.
 - **Un bug trouvé en vérif navigateur est une spec absente**, pas un accident : interdiction de cowboy fix, il repart en cycle TDD complet.
