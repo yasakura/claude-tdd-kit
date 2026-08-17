@@ -1,6 +1,6 @@
 # claude-tdd-kit
 
-Un agent de discipline et trois slash commands pour [Claude Code](https://claude.com/claude-code), qui imposent le **TDD strict (Uncle Bob)** et des **frontières de clean architecture** sur tes projets.
+Deux agents de discipline et trois slash commands pour [Claude Code](https://claude.com/claude-code), qui imposent le **TDD strict (Uncle Bob)** et des **frontières de clean architecture** sur tes projets.
 
 L'idée : Claude code vite, et cède facilement à la facilité quand on lui demande une feature. Ce kit lui retire cette liberté. Aucune ligne d'implémentation n'est écrite sans un test rouge **observé** au préalable, et aucun test vert n'est modifié sans validation explicite.
 
@@ -9,6 +9,7 @@ L'idée : Claude code vite, et cède facilement à la facilité quand on lui dem
 | | Rôle |
 |---|---|
 | **`tdd-clean-coder`** (agent) | Écrit le code productif. Boucle `[RED]` → `[GREEN]` → `[REFACTOR]` sans exception. Refuse d'implémenter avant un rouge observé, refuse le test-tampering, vérifie les imports contre les boundaries. |
+| **`mutation-auditor`** (agent) | Exécute le mutation testing et **instruit chaque survivant** : trou de test réel avec son scénario non couvert, équivalent toléré, ou code mort à supprimer. Ne modifie rien. Séparé de l'agent qui écrit le code, exprès — celui-là ne doit pas noter sa propre copie. |
 | **`/tdd <tâche>`** | Délègue une tâche à l'agent, puis enchaîne sur une vérification navigateur si la tâche a touché l'UI. |
 | **`/tdd-init`** | Bootstrappe la gouvernance dans un projet : audit de la stack, génération d'un `CLAUDE.md` (boundaries + règles TDD + anti test-tampering + Definition of Done), proposition des garde-fous techniques. |
 | **`/verify <route>`** | Vérification navigateur ciblée via Chrome DevTools MCP : navigate + screenshot + erreurs console + interactions. Observation pure, aucune modification de code. |
