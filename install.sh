@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Installe le kit TDD dans ~/.claude/ (agents + slash commands).
+# Installe le kit TDD dans ~/.claude/ (agents + slash commands + skills).
 #
 #   ./install.sh              symlinks (recommandé — `git pull` met tout à jour)
 #   ./install.sh --copy       copies indépendantes
@@ -66,8 +66,43 @@ echo "  source : $REPO_DIR"
 echo "  cible  : $CLAUDE_DIR"
 echo
 
+install_skill() {
+  local src="$1" dest_dir="$CLAUDE_DIR/skills"
+  local dest="$dest_dir/$(basename "$src")"
+
+  mkdir -p "$dest_dir"
+
+  if [ "$MODE" = "uninstall" ]; then
+    # Une skill est un DOSSIER : on ne retire que le lien qui pointe vers ce repo.
+    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+      rm "$dest"; echo "  retiré   $dest"
+    elif [ -e "$dest" ]; then
+      echo "  gardé    $dest (dossier réel, pas un lien de ce repo — à retirer à la main)"
+    fi
+    return
+  fi
+
+  if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ] && [ "$MODE" = "symlink" ]; then
+    echo "  ok       $dest"
+    return
+  fi
+
+  # Un dossier réel préexistant n'est jamais écrasé.
+  if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+    mv "$dest" "$dest.bak-$STAMP"
+    echo "  sauvegardé -> $dest.bak-$STAMP"
+  fi
+
+  if [ "$MODE" = "copy" ]; then
+    rm -rf "$dest"; cp -R "$src" "$dest"; echo "  copié    $dest"
+  else
+    ln -sfn "$src" "$dest"; echo "  lié      $dest"
+  fi
+}
+
 for f in "$REPO_DIR"/agents/*.md;   do install_one "$f" "$CLAUDE_DIR/agents";   done
 for f in "$REPO_DIR"/commands/*.md; do install_one "$f" "$CLAUDE_DIR/commands"; done
+for d in "$REPO_DIR"/skills/*/;     do [ -d "$d" ] && install_skill "${d%/}";   done
 
 echo
 if [ "$MODE" = "uninstall" ]; then
